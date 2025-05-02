@@ -15,3 +15,13 @@ class FoodForm(forms.ModelForm):
     class Meta:
         model = FoodOrder
         fields = ['customer_name','food', 'quantity']
+
+# foodapp/forms.py
+
+from django import forms
+from .models import MenuItem
+
+class FoodForm(forms.ModelForm):
+    class Meta:
+        model = MenuItem
+        fields = ['name', 'description', 'price', 'is_available']

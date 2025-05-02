@@ -50,3 +50,118 @@ def all_view(request):
 def order_summary(request):
     alldatas = FoodOrder.objects.all()
     return render(request, "summary.html", context={'alldatas': alldatas})
+
+# # foodapp/views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import MenuItem, FoodOrder
+from .food import Inputform, LoginForm, FoodForm
+from django.contrib.auth.decorators import login_required
+
+# Show menu to users
+def menu_view(request):
+    items = MenuItem.objects.all()  # Fetch all menu items
+    return render(request, 'menu.html', {'items': items})
+
+# Admin page to add new menu item
+@login_required
+def add_menu_item(request):
+    if request.user.is_staff:  # Check if the user is admin
+        if request.method == 'POST':
+            form = FoodForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Menu item added successfully!")
+                return redirect('menu')
+        else:
+            form = FoodForm()
+        return render(request, 'add_menu_item.html', {'form': form})
+    else:
+        return redirect('menu')  # Redirect non-admin users to menu
+
+# Admin page to update menu item
+@login_required
+def update_menu_item(request, item_id):
+    if request.user.is_staff:  # Check if the user is admin
+        item = get_object_or_404(MenuItem, id=item_id)
+        if request.method == 'POST':
+            form = FoodForm(request.POST, instance=item)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Menu item updated successfully!")
+                return redirect('menu')
+        else:
+            form = FoodForm(instance=item)
+        return render(request, 'update_menu_item.html', {'form': form})
+    else:
+        return redirect('menu')  # Redirect non-admin users to menu
+
+# Admin page to delete menu item
+@login_required
+def delete_menu_item(request, item_id):
+    if request.user.is_staff:  # Check if the user is admin
+        item = get_object_or_404(MenuItem, id=item_id)
+        item.delete()
+        messages.success(request, "Menu item deleted successfully!")
+        return redirect('menu')
+    else:
+        return redirect('menu')  # Redirect non-admin users to menu
+
+
+# # Show menu to users
+# def menu_view(request):
+#     items = MenuItem.objects.all()
+#     return render(request, 'menu.html', {'items': items})
+
+# # Place an order
+# def place_order(request, item_id):
+#     item = get_object_or_404(MenuItem, id=item_id)
+#     if request.method == 'POST':
+#         customer_name = request.POST.get('customer_name')
+#         quantity = request.POST.get('quantity')
+#         if customer_name and quantity:
+#             Order.objects.create(
+#                 customer_name=customer_name,
+#                 menu_item=item,
+#                 quantity=quantity
+#             )
+#             return redirect('order_success')
+#     return render(request, 'place_order.html', {'item': item})
+
+# # After successful order
+# def order_success(request):
+#     return render(request, 'order_success.html')
+
+# # Admin view to see all orders
+# def view_orders(request):
+#     orders = Order.objects.all().order_by('-order_time')
+#     return render(request, 'view_orders.html', {'orders': orders})
+
+# # Admin CRUD for Menu Items
+# def add_menu_item(request):
+#     if request.method == 'POST':
+#         name = request.POST.get('name')
+#         price = request.POST.get('price')
+#         if name and price:
+#             MenuItem.objects.create(name=name, price=price)
+#             return redirect('menu_management')
+#     return render(request, 'add_menu_item.html')
+
+# def update_menu_item(request, item_id):
+#     item = get_object_or_404(MenuItem, id=item_id)
+#     if request.method == 'POST':
+#         item.name = request.POST.get('name')
+#         item.price = request.POST.get('price')
+#         item.save()
+#         return redirect('menu_management')
+#     return render(request, 'update_menu_item.html', {'item': item})
+
+# def delete_menu_item(request, item_id):
+#     item = get_object_or_404(MenuItem, id=item_id)
+#     item.delete()
+#     return redirect('menu_management')
+
+# def menu_management(request):
+#     items = MenuItem.objects.all()
+#     return render(request, 'menu_management.html', {'items': items})

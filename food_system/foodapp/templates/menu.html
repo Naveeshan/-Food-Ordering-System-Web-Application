@@ -1,0 +1,20 @@
+<!-- foodapp/templates/menu.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu</title>
+</head>
+<body>
+    <h2>Menu</h2>
+    <ul>
+        {% for item in items %}
+            <li>
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.description }}</p>
+                <p>Price: ${{ item.price }}</p>
+                <p>Availability: {% if item.is_available %} Available {% else %} Unavailable {% endif %}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
